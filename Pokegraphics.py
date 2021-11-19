@@ -16,6 +16,8 @@ def appStarted(app):
     app.spritestrip = app.loadImage(url)
     app.sprites = [ ]
     app.spritesdict = {}
+    app.spritedict2 = {}
+    app.spritestrip2 = app.loadImage(url)
     for k in app.Trainer1.poklist: 
         app.sprites = [ ]
         url = k.sprite
@@ -27,7 +29,19 @@ def appStarted(app):
                 sprite = app.spritestrip.crop((k.slist[j][i][0], k.slist[j][i][1] ,k.slist[j][i][2], k.slist[j][i][3]))
                 app.sprites.append(sprite)
         app.spritesdict[k.name] = app.sprites
-    app.spriteCounter = 0
+    for a in app.Trainer2.poklist: 
+        app.sprites2 = [ ]
+        url = a.sprite
+        app.spritestrip2 = app.loadImage(url)
+        for j in range(len(a.slist)):
+            for i in range(len(a.slist[0])):
+                if(a.slist[j][i] == (0,0,0,0)):
+                    continue
+                sprite = app.spritestrip2.crop((a.slist[j][i][0], a.slist[j][i][1] ,a.slist[j][i][2], a.slist[j][i][3]))
+                app.sprites2.append(sprite)
+        app.spritedict2[a.name] = app.sprites
+    app.spriteCounter1 = 0
+    app.spriteCounter2 = 0
 
 def battle(app,Trainer1s,Trainer2s):
             Pokemon1 = Trainer1s.curr
@@ -60,7 +74,8 @@ def timerFired(app):
     if( (app.Trainer1.teamalive and app.Trainer2.teamalive) and (app.allowmove)): 
         battle(app,app.Trainer1,app.Trainer2)
         app.allowmove = False
-    app.spriteCounter = (1 + app.spriteCounter) % len(app.spritesdict[app.Trainer1.curr.name])
+    app.spriteCounter1 = (1 + app.spriteCounter1) % len(app.spritesdict[app.Trainer1.curr.name])
+    app.spriteCounter2 = (1 + app.spriteCounter2) % len(app.spritesdict[app.Trainer1.curr.name])
     if(Trainer2.curr.currhp<=0):
         for i in range(len(app.Trainer2.pokelist())):
             if(app.Trainer2.pokelist()[i].currhp>0):
@@ -70,6 +85,7 @@ def timerFired(app):
         for i in range(len(app.Trainer1.pokelist())):
             if(app.Trainer1.pokelist()[i].currhp>0):
                 Trainer1.curr  = app.Trainer1.pokelist()[i]
+                app.spriteCounter1 = 0
                 break
     
       
@@ -99,8 +115,10 @@ def mousePressed(app, event):
     app.count +=1
     
 def redrawAll(app, canvas):
-    sprite = app.spritesdict[app.Trainer1.curr.name][app.spriteCounter]
+    sprite = app.spritesdict[app.Trainer1.curr.name][app.spriteCounter1]
+    sprite2 = app.spritedict2[app.Trainer2.curr.name][app.spriteCounter2]
     canvas.create_image(75, 250, image=ImageTk.PhotoImage(sprite))
+    canvas.create_image(300, 100, image=ImageTk.PhotoImage(sprite2))
     canvas.create_text(app.width*(3.5/5), app.height*(2.3/5),
                        text= 'Moves', font='Arial 12 bold')
 
@@ -125,8 +143,6 @@ def redrawAll(app, canvas):
     canvas.create_rectangle(app.width*(2.5/5),app.height*(2.5/5),
     app.width*(4.5/5),app.height*(3.5/5))
 
-    canvas.create_rectangle(app.width-50,50,app.width-app.width*(2/5), 
-    app.height//3,fill = app.Poke2col)
 
     canvas.create_text(app.width*(1/5), app.height*(2/5),
                        text= 'hp', font='Arial 15 bold')
@@ -158,11 +174,11 @@ runApp(width=400, height=400)
 
 '''
 def appStarted(app):
-    url = 'Sprites/Zapdos front.png'
+    url = 'Sprites/Zapdos back.png'
     app.spritestrip = app.loadImage(url)
     app.sprites = [ ]
     
-    slist = [[(5,0,95,100),(105,0,195,100),(195,0,285,100),(300,0,380,100),(490,0,560,100),(585,0,665,100),(690,0,760,100),(785,0,860,100)],
+    slist = [[(5,0,95,100),(105,0,195,100),(235,0,310,100),(340,0,420,100),(440,0,535,100),(565,0,665,100),(675,0,760,100),(785,0,870,100)],
            [(5,100,95,200),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0)]]
     for j in range(len(slist)):
             for i in range(len(slist[0])):
@@ -189,6 +205,6 @@ runApp(width=400, height=400)
 #slist = [[(65,100,155,200),(165,100,255,200),(260,100,345,200),(360,100,440,200),(455,100,535,200),(550,100,635,200),(650,100,730,200),(745,100,825,200),(845,100,935,200)],
 #           [(65,200,155,300)]]
 
-
-
 '''
+
+

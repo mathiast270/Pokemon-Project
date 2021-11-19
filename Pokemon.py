@@ -71,10 +71,14 @@ garslist = [[(0,0,80,100),(105,0,185,100),(215,0,292,100),(320,0,400,100),(425,0
 zaplist = [[(5,0,95,100),(105,0,195,100),(195,0,285,100),(300,0,380,100),(490,0,560,100),(585,0,665,100),(690,0,760,100),(785,0,860,100)],
            [(5,100,95,200),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0)]]
 
+zaplistb = [[(5,0,95,100),(105,0,195,100),(235,0,310,100),(340,0,420,100),(440,0,535,100),(565,0,665,100),(675,0,760,100),(785,0,870,100)],
+           [(5,100,95,200),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0)]]
 Garchomp = Pokemon('Garchomp',['Dragon','Ground'],
 [Earthquake,DragonClaw,Flamethrower,Dragonpulse],359,259,420,289,269,303,garslist,'Sprites/Garchomp back.png')
 Zapdos = Pokemon('Zapdos',['Electric','Flying'], [Thunderbolt,Heatwave,Hurricane,FocusBlast],
 279,349,384,269,279,299,zaplist,'Sprites/Zapdos front.png')
+Zapdos2 = Pokemon('Zapdos',['Electric','Flying'], [Thunderbolt,Heatwave,Hurricane,FocusBlast],
+279,349,384,269,279,299,zaplistb,'Sprites/Zapdos back.png')
 Garchomp2 = Pokemon('Garchomp2',['Dragon','Ground'],
 [Earthquake,DragonClaw,Flamethrower,Dragonpulse],359,259,420,289,269,303,garslist,'Sprites/Garchomp back.png')
 Garchomp3 = Pokemon('Garchomp3',['Dragon','Ground'],
@@ -98,7 +102,7 @@ Garchomp11 = Pokemon('Garchomp11',['Dragon','Ground'],
 Garchomp12 = Pokemon('Garchomp12',['Dragon','Ground'],
 [Earthquake,DragonClaw,Flamethrower,Dragonpulse],359,259,420,289,269,303,garslist,'Sprites/Garchomp front.png')
 Trainer1 = Trainer('Goku',Garchomp,Zapdos,Garchomp3,Garchomp4,Garchomp5,Garchomp6)
-Trainer2 = Trainer('Bob',Garchomp7,Garchomp8,Garchomp9,Garchomp10,Garchomp11,Garchomp12)
+Trainer2 = Trainer('Bob',Garchomp7,Zapdos2,Garchomp9,Garchomp10,Garchomp11,Garchomp12)
 #print(delay(5))
 #Use dictionary later 
 def typeeffectiveness(defender,moveused):
