@@ -323,6 +323,8 @@ def typeeffectiveness(defender,moveused):
     return x
 
 def damage (Pokemon1a,Pokemon2d,moveused):
+    if(moveused == None):
+        return 0
     x = 1
     y = typeeffectiveness(Pokemon2d,moveused)
     if(moveused.type == Pokemon1a.type):

@@ -7,16 +7,20 @@ def appStarted(app):
     app.Trainer2 = Trainer2
     app.Poke1col = 'green'
     app.Poke2col = 'green'
-    app.allowmove = False 
+    app.allowmove = True 
     app.count = 0
     app.currmove = None
+    app.currmove2 = None
     app.pokeswitch = None
+    app.allowmove2 = True
+    app.allowmoves = False
     #for sprite drawing
     url = 'Sprites/Garchomp back.png'
     app.spritestrip = app.loadImage(url)
     app.sprites = [ ]
     app.spritesdict = {}
     app.spritedict2 = {}
+    app.count = 0
     app.spritestrip2 = app.loadImage(url)
     for k in app.Trainer1.poklist: 
         app.sprites = [ ]
@@ -39,13 +43,13 @@ def appStarted(app):
                     continue
                 sprite = app.spritestrip2.crop((a.slist[j][i][0], a.slist[j][i][1] ,a.slist[j][i][2], a.slist[j][i][3]))
                 app.sprites2.append(sprite)
-        app.spritedict2[a.name] = app.sprites
+        app.spritedict2[a.name] = app.sprites2
     app.spriteCounter1 = 0
     app.spriteCounter2 = 0
 
 def battle(app,Trainer1s,Trainer2s):
             Pokemon1 = Trainer1s.curr
-            Pokemon2 = Trainer2s.curr
+            Pokemon2 = Trainer2s.curr   
             if(app.currmove == 'switch'):
                 Trainer1s.curr = app.pokeswitch
             if(Pokemon1.currspeed>Pokemon2.currspeed):
@@ -57,6 +61,7 @@ def battle(app,Trainer1s,Trainer2s):
                     return
                 x = random.randint(0,3)
                 move2 = Pokemon2.moves[x]
+                app.currmove2 = move2
                 damages2 = damage(Pokemon2,Pokemon1,move2)
                 Pokemon1.currhp -= damages2
             else:
@@ -70,16 +75,26 @@ def battle(app,Trainer1s,Trainer2s):
                 if(app.currmove != 'switch'):
                     damages = damage(Pokemon1,Pokemon2,app.currmove)
                     Pokemon2.currhp -=damages
+#def keyPressed(app,event):
+#    if(event.key == 'k' and app.allowmove == False):
+#        app.allowmove == True
+#        app.allowmove2 == False
+#    elif(event.key == 'k' and app.allowmove == True and app.allowmove2 == False):
+#        app.allowmove2 == True
 def timerFired(app):
-    if( (app.Trainer1.teamalive and app.Trainer2.teamalive) and (app.allowmove)): 
+    if( (app.Trainer1.teamalive and app.Trainer2.teamalive) and (app.allowmoves)): 
         battle(app,app.Trainer1,app.Trainer2)
         app.allowmove = False
+        app.allowmoves = False
+        
+        app.count +=1
     app.spriteCounter1 = (1 + app.spriteCounter1) % len(app.spritesdict[app.Trainer1.curr.name])
-    app.spriteCounter2 = (1 + app.spriteCounter2) % len(app.spritesdict[app.Trainer1.curr.name])
+    app.spriteCounter2 = (1 + app.spriteCounter2) % len(app.spritedict2[app.Trainer2.curr.name])
     if(Trainer2.curr.currhp<=0):
         for i in range(len(app.Trainer2.pokelist())):
             if(app.Trainer2.pokelist()[i].currhp>0):
                 Trainer2.curr  = app.Trainer2.pokelist()[i]
+                app.spriteCounter2 = 0
                 break
     if(Trainer1.curr.currhp<=0):
         for i in range(len(app.Trainer1.pokelist())):
@@ -90,38 +105,54 @@ def timerFired(app):
     
       
 def mousePressed(app, event):
-    app.count+=1    #What I need to do: If my Pokemon is dead let me switch for free
-    if(event.x>(2.5/5)*app.width and event.x<(3.5/5)*app.width and #and if enemy is dead 
-        event.y>(2.5/5)*app.height and event.y<(3/5)*app.height ):
-        app.allowmove = True
-        app.currmove = app.Trainer1.curr.moves[0]
-    elif(event.x>(3.5/5)*app.width and event.x<(4.5/5)*app.width and  
-        event.y>(2.5/5)*app.height and event.y<(3/5)*app.height ):
-        app.allowmove = True
-        app.currmove = app.Trainer1.curr.moves[1]
-    elif(event.x>(2.5/5)*app.width and event.x<(3.5/5)*app.width and  
-        event.y>(3/5)*app.height and event.y<(3.5/5)*app.height ):
-        app.allowmove = True
-        app.currmove = app.Trainer1.curr.moves[2]
-    elif(event.x>(3.5/5)*app.width and event.x<(4.5/5)*app.width and  
-        event.y>(3/5)*app.height and event.y<(3.5/5)*app.height ):
-        app.allowmove = True
-        app.currmove = app.Trainer1.curr.moves[0]
-    elif(event.x>(1/7)*app.width and event.x<(2/7)*app.width and event.y>(4/5)*app.height and event.y<app.height*(4.5/5) and app.Trainer1.pokelist()[0].currhp >0):
-        app.pokeswitch = app.Trainer1.pokelist()[0]
-        app.allowmove = True
-        app.currmove = 'switch'
-    app.counter += 1
-    app.count +=1
+        app.count+=1    #What I need to do: If my Pokemon is dead let me switch for free
+    #if(app.allowmove and app.allowmove2):
+        if(event.x>(2.5/5)*app.width and event.x<(3.5/5)*app.width and #and if enemy is dead 
+            event.y>(2.5/5)*app.height and event.y<(3/5)*app.height ):
+            app.allowmoves = True
+            app.currmove = app.Trainer1.curr.moves[0]
+        elif(event.x>(3.5/5)*app.width and event.x<(4.5/5)*app.width and  
+            event.y>(2.5/5)*app.height and event.y<(3/5)*app.height ):
+            app.allowmoves = True
+            app.currmove = app.Trainer1.curr.moves[1]
+        elif(event.x>(2.5/5)*app.width and event.x<(3.5/5)*app.width and  
+            event.y>(3/5)*app.height and event.y<(3.5/5)*app.height ):
+            app.allowmoves = True
+            app.currmove = app.Trainer1.curr.moves[2]
+        elif(event.x>(3.5/5)*app.width and event.x<(4.5/5)*app.width and  
+            event.y>(3/5)*app.height and event.y<(3.5/5)*app.height ):
+            app.allowmoves = True
+            app.currmove = app.Trainer1.curr.moves[0]
+        elif(event.x>(1/7)*app.width and event.x<(2/7)*app.width and event.y>(4/5)*app.height and event.y<app.height*(4.5/5) and app.Trainer1.pokelist()[0].currhp >0):
+            app.pokeswitch = app.Trainer1.pokelist()[0]
+            app.allowmoves = True
+            app.currmove = 'switch'
+        elif(event.x>(2/7)*app.width and event.x<(3/7)*app.width and event.y>(4/5)*app.height and event.y<app.height*(4.5/5) and app.Trainer1.pokelist()[0].currhp >0):
+            app.pokeswitch = app.Trainer1.pokelist()[1]
+            app.allowmoves = True
+            app.currmove = 'switch'
+        elif(event.x>(3/7)*app.width and event.x<(4/7)*app.width and event.y>(4/5)*app.height and event.y<app.height*(4.5/5) and app.Trainer1.pokelist()[0].currhp >0):
+            app.pokeswitch = app.Trainer1.pokelist()[2]
+            app.allowmoves = True
+            app.currmove = 'switch'
+        elif(event.x>(4/7)*app.width and event.x<(5/7)*app.width and event.y>(4/5)*app.height and event.y<app.height*(4.5/5) and app.Trainer1.pokelist()[0].currhp >0):
+            app.pokeswitch = app.Trainer1.pokelist()[3]
+            app.allowmoves = True
+            app.currmove = 'switch'
+        elif(event.x>(4/7)*app.width and event.x<(5/7)*app.width and event.y>(4/5)*app.height and event.y<app.height*(4.5/5) and app.Trainer1.pokelist()[0].currhp >0):
+            app.pokeswitch = app.Trainer1.pokelist()[4]
+            app.allowmoves = True
+            app.currmove = 'switch'
+        app.counter += 1
+        app.count +=1
     
-def redrawAll(app, canvas):
+def redrawAll(app, canvas):#make a variable that is initally set false until I attack and then when it is true set write a statement that I used move x lower the hp and for the next player have it begin only when I click enter
     sprite = app.spritesdict[app.Trainer1.curr.name][app.spriteCounter1]
     sprite2 = app.spritedict2[app.Trainer2.curr.name][app.spriteCounter2]
     canvas.create_image(75, 250, image=ImageTk.PhotoImage(sprite))
     canvas.create_image(300, 100, image=ImageTk.PhotoImage(sprite2))
     canvas.create_text(app.width*(3.5/5), app.height*(2.3/5),
                        text= 'Moves', font='Arial 12 bold')
-
     canvas.create_text(app.width*(3/5), app.height*(2.75/5),
                        text= app.Trainer1.curr.moves[0].name, font='Arial 10 bold')
 
@@ -161,41 +192,81 @@ def redrawAll(app, canvas):
     elif(app.Trainer1.teamalive == False):
         canvas.create_text(app.width/2, app.height/2.5,
                        text= f'{app.Trainer2.name} wins', font='Arial 12 bold')
-    if(app.Trainer1.curr.currhp>0):
+
+    #if(app.Trainer1.curr.currhp>0 and app.allowmove == False):
+     #   canvas.create_text(app.width/2, app.height*(3.5/5), text = f'{app.Trainer1.curr.name} used {app.currmove.name}' )
+
+    #for i in range(int(50*(app.Trainer1.curr.currhp/app.Trainer1.curr.hp))):
+     #   canvas.create_rectangle(i*2+30,app.height*(2/5)+25,(i+1)*2+30,
+      #  app.height*(2/5)+30,fill = 'green')
+
+    if(app.Trainer1.curr.currhp>0): #and app.allowmove == True):
         for i in range(int(50*(app.Trainer1.curr.currhp/app.Trainer1.curr.hp))):
             canvas.create_rectangle(i*2+30,app.height*(2/5)+25,(i+1)*2+30,
-            app.height*(2/5)+30,fill = 'green')
-    if(app.Trainer2.curr.currhp>0):
+                    app.height*(2/5)+30,fill = 'green')
+
+    #if(app.Trainer2.curr.currhp>0 and app.allowmove2 == False):
+       # canvas.create_text(app.width/2, app.height*(3.5/5), text = f'{app.Trainer2.curr.name} used {app.currmove2.name}!' )
+       # for j in range(int(50*(app.Trainer2.curr.currhp/app.Trainer2.curr.hp))):
+        #    canvas.create_rectangle(app.width - (j*2+55),app.height*(1/10),app.width- 
+         #   ((j+1)*2+55), app.height*(1/10)+5,fill = 'green')
+
+    if(app.Trainer2.curr.currhp>0):        
         for j in range(int(50*(app.Trainer2.curr.currhp/app.Trainer2.curr.hp))):
-            canvas.create_rectangle(app.width - (j*2+55),app.height*(1/10),app.width- 
-            ((j+1)*2+55), app.height*(1/10)+5,fill = 'green')
+                canvas.create_rectangle(app.width - (j*2+55),app.height*(1/10),app.width- 
+                ((j+1)*2+55), app.height*(1/10)+5,fill = 'green')
 
 runApp(width=400, height=400)
-
 '''
+
 def appStarted(app):
-    url = 'Sprites/Zapdos back.png'
+    url = 'Sprites/boy_run_1.png'
     app.spritestrip = app.loadImage(url)
-    app.sprites = [ ]
-    
-    slist = [[(5,0,95,100),(105,0,195,100),(235,0,310,100),(340,0,420,100),(440,0,535,100),(565,0,665,100),(675,0,760,100),(785,0,870,100)],
-           [(5,100,95,200),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0)]]
-    for j in range(len(slist)):
-            for i in range(len(slist[0])):
-                if(slist[j][i] == (0,0,0,0)):
-                    continue
-                sprite = app.spritestrip.crop((slist[j][i][0], slist[j][i][1] ,slist[j][i][2], slist[j][i][3]))
-                app.sprites.append(sprite)
+    app.temp = [ ]
+    app.sprite2 = []
+    app.pos = 0
+    for j in range(4):
+        app.temp = [ ]
+        for i in range(4):
+            sprite = app.spritestrip.crop((0+60*i,10+60*j,60*(i+1),10+60*(j+1)))
+            app.temp.append(sprite)
+        app.sprite2.append(app.temp) 
     
     
     app.spriteCounter = 0
 
 def timerFired(app):
-    app.spriteCounter = (1 + app.spriteCounter) % len(app.sprites)
+    app.spriteCounter = (1 + app.spriteCounter) % len(app.sprite2[app.pos])
 
 def redrawAll(app, canvas):
-    sprite = app.sprites[app.spriteCounter]
+    sprite = app.sprite2[0][app.spriteCounter]
     canvas.create_image(300, 300, image=ImageTk.PhotoImage(sprite))
+    #canvas.create_image(200, 200, image=ImageTk.PhotoImage(app.spritestrip))
+    canvas.create_line(260,0,260,400)
+    canvas.create_line(0,100,1000,100)
+runApp(width=400, height=400)
+
+
+
+
+def appStarted(app):
+    url = 'Sprites/Grass.png'
+    app.spritestrip = app.loadImage(url)
+    app.sprites = [ ]
+    url2 = 'Sprites/Grass 2.png'
+    app.spritestrip2 = app.loadImage(url2)
+
+    app.sprite = app.spritestrip.crop((30,0,55,30))
+               
+    
+    
+    app.spriteCounter = 0
+
+def timerFired(app):
+   return
+
+def redrawAll(app, canvas):
+    canvas.create_image(300, 300, image=ImageTk.PhotoImage(app.spritestrip2))
     canvas.create_image(500, 200, image=ImageTk.PhotoImage(app.spritestrip))
     canvas.create_line(105,0,105,400)
     #canvas.create_line(0,300,1000,300)
@@ -205,6 +276,6 @@ runApp(width=400, height=400)
 #slist = [[(65,100,155,200),(165,100,255,200),(260,100,345,200),(360,100,440,200),(455,100,535,200),(550,100,635,200),(650,100,730,200),(745,100,825,200),(845,100,935,200)],
 #           [(65,200,155,300)]]
 
-'''
 
+'''
 

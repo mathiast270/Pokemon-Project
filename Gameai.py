@@ -34,7 +34,7 @@ def aitree(self,enemy,depth,dic,prevmove):
             if(j.currhp<0):
                 continue
             moveuenemy = pickbestmove(x,y)
-            moveuself = 'switch-' + j.name
+            moveuself = 'switch+' + j.name
             battle2(a,b,moveuenemy,moveuself)
             c = prevmove + '-' + moveuself
             dic[c] = state(a,b)
@@ -96,7 +96,7 @@ def switch(Trainer1):
 
 def battle2(self,enemy,movenemy,moveself):
             if(type(moveself) == string):
-                y = moveself.split('-')
+                y = moveself.split('+')
                 for i in self.pokelist():
                     if(y[1] == i.name):
                         self.curr = i
@@ -126,3 +126,4 @@ def ai(self,enemy):
     return pickmove(self)
 
 print(ai(Trainer1,Trainer2))
+print(statedict)
