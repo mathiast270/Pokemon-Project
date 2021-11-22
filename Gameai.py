@@ -1,5 +1,5 @@
 #separte battle function for the AI
-from Pokegraphics import*
+from Pokemon import*
 import copy
 import string
 statedict = {}
@@ -61,6 +61,7 @@ def state(self,enemy):
     return (hpself - hpenemy)/(hpself+hpenemy)
 
 def pickmove(self):
+    print(self.curr.currhp)
     best = -10000
     bestmove = ''
     for k in statedict:
@@ -100,11 +101,11 @@ def battle2(self,enemy,movenemy,moveself):
                 for i in self.pokelist():
                     if(y[1] == i.name):
                         self.curr = i
-                damages = damage(enemy,self,movenemy)
+                damages = damage(enemy.curr,self.curr,movenemy)
                 self.curr.currhp -= damages
             else:
                 if(self.curr.speed>enemy.curr.speed):
-                    dam1 = (self.curr,enemy.curr,moveself)
+                    dam1 = damage(self.curr,enemy.curr,moveself)
                     enemy.curr.currhp -= dam1
                     if(enemy.curr.currhp<= 0 ):
                         switch(enemy)
@@ -122,8 +123,7 @@ def battle2(self,enemy,movenemy,moveself):
 
 
 def ai(self,enemy):
-    wrapperaitree(self,enemy,0)
-    return pickmove(self)
-
-print(ai(Trainer1,Trainer2))
-print(statedict)
+    selfc = self.makecopy()
+    enemyc = enemy.makecopy()
+    wrapperaitree(selfc,enemyc,0)
+    return pickmove(selfc)

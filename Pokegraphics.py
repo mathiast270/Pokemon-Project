@@ -1,6 +1,6 @@
 from Pokemon import*
 from cmu_112_graphics import*
-
+from Gameai import*
 def appStarted(app):
     app.counter = 0
     app.Trainer1 = Trainer1
@@ -48,10 +48,18 @@ def appStarted(app):
     app.spriteCounter2 = 0
 
 def battle(app,Trainer1s,Trainer2s):
+            
+            moveai = ai(Trainer2s,Trainer1s)
+            print(moveai.name)
             Pokemon1 = Trainer1s.curr
             Pokemon2 = Trainer2s.curr   
             if(app.currmove == 'switch'):
                 Trainer1s.curr = app.pokeswitch
+            if(type(moveai) == string):
+                pokeswitchs = moveai.split('+')[1]
+                for i in Trainer2.pokelist():
+                    if(i.name == pokeswitchs):
+                        Trainer2s.curr = i
             if(Pokemon1.currspeed>Pokemon2.currspeed):
                 if(app.currmove != 'switch'):
                     damages = damage(Pokemon1,Pokemon2,app.currmove)
@@ -59,16 +67,14 @@ def battle(app,Trainer1s,Trainer2s):
                 if(Pokemon2.currhp<0):
                     print(f'{Pokemon1.name} wins')
                     return
-                x = random.randint(0,3)
-                move2 = Pokemon2.moves[x]
-                app.currmove2 = move2
-                damages2 = damage(Pokemon2,Pokemon1,move2)
-                Pokemon1.currhp -= damages2
+                if(type(moveai) != string):
+                    app.currmove2 = moveai
+                    damages2 = damage(Pokemon2,Pokemon1,moveai)
+                    Pokemon1.currhp -= damages2
             else:
-                x = random.randint(0,3)
-                move2 = Pokemon2.moves[x]
-                damages2 = damage(Pokemon2,Pokemon1,move2)
-                Pokemon1.currhp -= damages2
+                if(type(moveai) != string):
+                    damages2 = damage(Pokemon2,Pokemon1,moveai)
+                    Pokemon1.currhp -= damages2
                 if(Pokemon1.currhp<0):
                     print(f'{Pokemon2.name} wins')
                     return
@@ -127,19 +133,19 @@ def mousePressed(app, event):
             app.pokeswitch = app.Trainer1.pokelist()[0]
             app.allowmoves = True
             app.currmove = 'switch'
-        elif(event.x>(2/7)*app.width and event.x<(3/7)*app.width and event.y>(4/5)*app.height and event.y<app.height*(4.5/5) and app.Trainer1.pokelist()[0].currhp >0):
+        elif(event.x>(2/7)*app.width and event.x<(3/7)*app.width and event.y>(4/5)*app.height and event.y<app.height*(4.5/5) and app.Trainer1.pokelist()[1].currhp >0):
             app.pokeswitch = app.Trainer1.pokelist()[1]
             app.allowmoves = True
             app.currmove = 'switch'
-        elif(event.x>(3/7)*app.width and event.x<(4/7)*app.width and event.y>(4/5)*app.height and event.y<app.height*(4.5/5) and app.Trainer1.pokelist()[0].currhp >0):
+        elif(event.x>(3/7)*app.width and event.x<(4/7)*app.width and event.y>(4/5)*app.height and event.y<app.height*(4.5/5) and app.Trainer1.pokelist()[2].currhp >0):
             app.pokeswitch = app.Trainer1.pokelist()[2]
             app.allowmoves = True
             app.currmove = 'switch'
-        elif(event.x>(4/7)*app.width and event.x<(5/7)*app.width and event.y>(4/5)*app.height and event.y<app.height*(4.5/5) and app.Trainer1.pokelist()[0].currhp >0):
+        elif(event.x>(4/7)*app.width and event.x<(5/7)*app.width and event.y>(4/5)*app.height and event.y<app.height*(4.5/5) and app.Trainer1.pokelist()[3].currhp >0):
             app.pokeswitch = app.Trainer1.pokelist()[3]
             app.allowmoves = True
             app.currmove = 'switch'
-        elif(event.x>(4/7)*app.width and event.x<(5/7)*app.width and event.y>(4/5)*app.height and event.y<app.height*(4.5/5) and app.Trainer1.pokelist()[0].currhp >0):
+        elif(event.x>(4/7)*app.width and event.x<(5/7)*app.width and event.y>(4/5)*app.height and event.y<app.height*(4.5/5) and app.Trainer1.pokelist()[4].currhp >0):
             app.pokeswitch = app.Trainer1.pokelist()[4]
             app.allowmoves = True
             app.currmove = 'switch'

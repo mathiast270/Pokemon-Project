@@ -22,6 +22,7 @@ class Pokemon(object):
         self.defense = defense
         self.spdefense = spdefense
         self.speed = speed
+        self.slist = slist
         self.sprite = sprite
         self.currattack = self.attack
         self.currspattack = self.spattack #stats during match which can change
@@ -30,6 +31,10 @@ class Pokemon(object):
         self.currspdefense = self.spdefense
         self.currspeed = self.speed
         self.slist = slist
+    def pokecopy(self):
+        x = Pokemon(self.name,self.type,self.moves,self.attack,self.currspattack,self.hp,self.defense
+        ,self.spdefense,self.speed,self.slist,self.sprite)
+        return x
     
 
 class Trainer(object):
@@ -60,7 +65,13 @@ class Trainer(object):
                 continue
             else:
                 L.append(self.poklist[i])
-        return L     
+        return L
+    def makecopy(self):
+        l = []
+        for j in self.poklist:
+            l.append(j.pokecopy())
+        Newt = Trainer(self.name,l[0],l[1],l[2],l[3],l[4],l[5])
+        return Newt
 
 
             #attacker   #defender
