@@ -110,16 +110,41 @@ def timerFired(app):
     return
 def ifanyin(app):
     best = 10000000
+    cx2 = None
     for (cx, cy,roomsize,depth) in ls:
+        x = ls.index([cx,cy,roomsize,depth])+1
         cx -= app.scrollX
         cy +=app.scrollY 
-        if(best>distance(cx,cy,app.cx,app.cy) and depth ==2):
-            cx1 = cx
-            cy2 = cy
-            room = roomsize
-            best = distance(cx,cy,app.cx,app.cy)
-    if(cx1-room/2<app.cx<cx1+room/2 and cy2-room/2<app.cy<cy2+room/2):
-        return True 
+        if(depth == 2):
+            if(x<len(ls)-1):
+                for j in range(x,len(ls)):
+                    if(j<len(ls) and ls[j][3] == 2):
+                        (cx2,cy3,roomsize2, depth2) = ls[j]
+                        cx2 -=app.scrollX
+                        cy3 +=app.scrollY
+                       
+                        if(cx2>cx):
+                            if(cx+roomsize/2<app.cx<cx2+roomsize2/2 and cy-5<app.cy<cy+5):
+                                return True
+                        elif(cx>cx2):
+                            if(cx2+roomsize2/2<app.cx<cx+roomsize/2 and cy-5<app.cy<cy+5):
+                                return True
+                        if(cy3>cy):
+                            if(cy+roomsize/2<app.cy<cy3+roomsize2/2 and cx2-5<app.cx<cx2+5):
+                                return True
+                        elif(cy>cy3):
+                            if(cy3+roomsize2/2<app.cy<cy+roomsize/2 and cx2-5<app.cx<cx2+5):
+                                return True
+            if(best>distance(cx,cy,app.cx,app.cy)):
+                cx1 = cx
+                cy2 = cy
+                room = roomsize
+                best = distance(cx,cy,app.cx,app.cy)
+                y = x
+    
+    
+    if((cx1-room/2<app.cx<cx1+room/2 and cy2-room/2<app.cy<cy2+room/2)):
+         return True
     return False      
 def redrawAll(app, canvas):
     thickness = 5
@@ -135,8 +160,8 @@ def redrawAll(app, canvas):
             
             for j in range(x,len(ls)):
                 if(j<len(ls) and ls[j][3] == 2):# have another check for depth
-                    canvas.create_rectangle(ls[j][0] + ls[j][2]/2-app.scrollX,cy - thickness,cx + roomsize/2, cy + thickness,fill = 'blue')
-                    canvas.create_rectangle(ls[j][0] + ls[j][2]/2-app.scrollX,ls[j][1] - thickness +ls[j][2]/2+app.scrollY,ls[j][0] + ls[j][2]/2 + thickness - app.scrollX,cy,fill = 'blue')
+                    canvas.create_rectangle(ls[j][0] + ls[j][2]/2-app.scrollX,cy - thickness,cx + roomsize/2, cy +thickness,fill = 'blue')
+                    canvas.create_rectangle(ls[j][0] + ls[j][2]/2-app.scrollX- thickness,ls[j][1]  +ls[j][2]/2+app.scrollY,ls[j][0] + ls[j][2]/2 + thickness - app.scrollX,cy,fill = 'blue')
                     alreadin.append(j)
 
   #  for j in range(16):
