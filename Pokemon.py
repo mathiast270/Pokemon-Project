@@ -32,7 +32,7 @@ class Pokemon(object):
         self.currspeed = self.speed
         self.slist = slist
     def pokecopy(self):
-        x = Pokemon(self.name,self.type,self.moves,self.attack,self.currspattack,self.hp,self.defense
+        x = Pokemon(self.name,self.type,self.moves,self.attack,self.currspattack,self.currhp,self.defense
         ,self.spdefense,self.speed,self.slist,self.sprite)
         return x
     
@@ -71,7 +71,13 @@ class Trainer(object):
         for j in self.poklist:
             l.append(j.pokecopy())
         Newt = Trainer(self.name,l[0],l[1],l[2],l[3],l[4],l[5])
+        for i in Newt.poklist:
+            if(i.currhp >0):
+                Newt.curr = i
         return Newt
+    def restoreall(self):
+        for i in self.poklist:
+            i.currhp = i.hp 
 
 
             #attacker   #defender

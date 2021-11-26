@@ -1,7 +1,18 @@
 from Pokemon import*
 from cmu_112_graphics import*
 from Gameai import*
+import math
+def distance(x1, y1, x2, y2):
+    x = ((x2-x1)**2 + (y2-y1)**2)**0.5  # used formula
+    return x
+
+def circlesIntersect(x1, y1, r1, x2, y2, r2):
+    x = distance(x1,y1,x2,y2)
+    result = (x <= r1+r2)
+    return result
+
 def appStarted(app):
+    app.mode = 'overworld'
     app.counter = 0
     app.Trainer1 = Trainer1
     app.Trainer2 = Trainer2
@@ -46,11 +57,39 @@ def appStarted(app):
         app.spritedict2[a.name] = app.sprites2
     app.spriteCounter1 = 0
     app.spriteCounter2 = 0
-
+    app.scrollY = 0
+    app.scrollX = 0
+    app.dotsgrass = []
+    for j in range(4):
+       for i in range(app.width//24):
+          app.dotsgrass.append((i*24,-300 + j*21))
+    app.dotstrees = [(random.randrange(app.width),
+                  random.randrange(60, app.height)) for _ in range(10)]
+    url2 = 'Sprites/Grass 2.png'
+    app.spritestrip2 = app.loadImage(url2)
+    url3 = 'Sprites/Trees.png'
+    app.spritestrip3 = app.loadImage(url3)
+    url = 'Sprites/boy_run_1.png'
+    app.spritestrip = app.loadImage(url)
+    url4 = 'Sprites/Grass.png'
+    app.spritestrip4 = app.loadImage(url4)
+    app.temp = [ ]
+    app.sprite2 = []
+    app.pos = 0
+    url5 = 'Sprites/Gym.png'
+    app.spritestrip5 = app.loadImage(url5)
+    app.gym = (200,-500)
+    for j in range(4):
+        app.temp = [ ]
+        for i in range(4):
+            sprite = app.spritestrip.crop((0+60*i,10+60*j,60*(i+1),10+60*(j+1)))
+            app.temp.append(sprite)
+        app.sprite2.append(app.temp) 
+    app.spriteCounter = 0
+    app.count = 0
 def battle(app,Trainer1s,Trainer2s):
-            
             moveai = ai(Trainer2s,Trainer1s)
-            print(moveai.name)
+           # print(moveai.name)
             Pokemon1 = Trainer1s.curr
             Pokemon2 = Trainer2s.curr   
             if(app.currmove == 'switch'):
@@ -87,8 +126,8 @@ def battle(app,Trainer1s,Trainer2s):
 #        app.allowmove2 == False
 #    elif(event.key == 'k' and app.allowmove == True and app.allowmove2 == False):
 #        app.allowmove2 == True
-def timerFired(app):
-    if( (app.Trainer1.teamalive and app.Trainer2.teamalive) and (app.allowmoves)): 
+def battle_timerFired(app):
+    if( (app.Trainer1.teamalive() and app.Trainer2.teamalive()) and (app.allowmoves)): 
         battle(app,app.Trainer1,app.Trainer2)
         app.allowmove = False
         app.allowmoves = False
@@ -96,21 +135,25 @@ def timerFired(app):
         app.count +=1
     app.spriteCounter1 = (1 + app.spriteCounter1) % len(app.spritesdict[app.Trainer1.curr.name])
     app.spriteCounter2 = (1 + app.spriteCounter2) % len(app.spritedict2[app.Trainer2.curr.name])
-    if(Trainer2.curr.currhp<=0):
+    if(app.Trainer2.curr.currhp<=0):
         for i in range(len(app.Trainer2.pokelist())):
             if(app.Trainer2.pokelist()[i].currhp>0):
                 Trainer2.curr  = app.Trainer2.pokelist()[i]
                 app.spriteCounter2 = 0
                 break
-    if(Trainer1.curr.currhp<=0):
+    if(app.Trainer1.curr.currhp<=0):
         for i in range(len(app.Trainer1.pokelist())):
             if(app.Trainer1.pokelist()[i].currhp>0):
                 Trainer1.curr  = app.Trainer1.pokelist()[i]
                 app.spriteCounter1 = 0
                 break
+    if(app.Trainer2.teamalive() == False or app.Trainer1.teamalive() == False):
+        app.mode = 'overworld'
+        app.Trainer2.restoreall()
+        app.Trainer1.restoreall()
     
       
-def mousePressed(app, event):
+def battle_mousePressed(app, event):
         app.count+=1    #What I need to do: If my Pokemon is dead let me switch for free
     #if(app.allowmove and app.allowmove2):
         if(event.x>(2.5/5)*app.width and event.x<(3.5/5)*app.width and #and if enemy is dead 
@@ -152,11 +195,11 @@ def mousePressed(app, event):
         app.counter += 1
         app.count +=1
     
-def redrawAll(app, canvas):#make a variable that is initally set false until I attack and then when it is true set write a statement that I used move x lower the hp and for the next player have it begin only when I click enter
+def battle_redrawAll(app, canvas):#make a variable that is initally set false until I attack and then when it is true set write a statement that I used move x lower the hp and for the next player have it begin only when I click enter
     sprite = app.spritesdict[app.Trainer1.curr.name][app.spriteCounter1]
     sprite2 = app.spritedict2[app.Trainer2.curr.name][app.spriteCounter2]
-    canvas.create_image(75, 250, image=ImageTk.PhotoImage(sprite))
-    canvas.create_image(300, 100, image=ImageTk.PhotoImage(sprite2))
+    canvas.create_image(app.width*(75/400), app.height*(250/400), image=ImageTk.PhotoImage(sprite))
+    canvas.create_image(app.width*(3/4), app.width*(1/4), image=ImageTk.PhotoImage(sprite2))
     canvas.create_text(app.width*(3.5/5), app.height*(2.3/5),
                        text= 'Moves', font='Arial 12 bold')
     canvas.create_text(app.width*(3/5), app.height*(2.75/5),
@@ -222,9 +265,85 @@ def redrawAll(app, canvas):#make a variable that is initally set false until I a
                 canvas.create_rectangle(app.width - (j*2+55),app.height*(1/10),app.width- 
                 ((j+1)*2+55), app.height*(1/10)+5,fill = 'green')
 
-runApp(width=400, height=400)
-'''
 
+
+def overworld_keyPressed(app, event):
+    if (event.key == "Left"):    
+        app.scrollX -= 10
+        app.pos = 1
+        app.spriteCounter = (1 + app.spriteCounter) % len(app.sprite2[app.pos])
+        if(ifanyin(app)):
+            app.scrollX+=10
+    elif (event.key == "Right"): 
+        app.scrollX += 10
+        app.pos = 2
+        app.spriteCounter = (1 + app.spriteCounter) % len(app.sprite2[app.pos])
+        if(ifanyin(app)):
+            app.scrollX-=10
+    elif(event.key == "Up"):    
+        app.scrollY +=10
+        app.pos = 3
+        app.spriteCounter = (1 + app.spriteCounter) % len(app.sprite2[app.pos])
+        if(ifanyin(app)):
+            app.scrollY-=10
+    elif(event.key == "Down"):  
+        app.scrollY -=10
+        app.pos = 0
+        app.spriteCounter = (1 + app.spriteCounter) % len(app.sprite2[app.pos])
+        if(ifanyin(app)):
+            app.scrollY+=10 
+def overworld_timerFired(app):
+    L = []
+    app.count +=1
+    for (cx, cy) in app.dotsgrass:
+        cx -= app.scrollX  
+        cy += app.scrollY
+        L.append((cx,cy))
+    for (cx, cy) in L:
+        if((app.width-25)/2<cx and cx <(app.width+25)/2 and (app.height-25)/2< cy and cy< (app.height+25)/2 and app.count%50 == 0):
+            print('hi')
+            app.mode = 'battle'
+            break
+def ifanyin(app):
+    for (cx, cy) in app.dotstrees:
+        cx -= app.scrollX
+        cy +=app.scrollY
+        if(circlesIntersect(cx,cy,10,app.width/2,app.height/2,10)):
+            return True
+    return False
+def overworld_redrawAll(app, canvas):
+    imgw = 400
+    imgh= 260
+    for i in range(math.ceil(app.width/imgw)):
+        for j in range(2):
+            canvas.create_image(imgw/2*(i+1), j*imgh, image=ImageTk.PhotoImage(app.spritestrip4))
+
+    
+    for (cx, cy) in app.dotsgrass:
+        cx -= app.scrollX  
+        cy += app.scrollY
+        canvas.create_image(cx, cy, image=ImageTk.PhotoImage(app.spritestrip2))
+    for (cx, cy) in app.dotstrees:
+        cx -= app.scrollX
+        cy += app.scrollY
+                 
+        canvas.create_image(cx, cy, image=ImageTk.PhotoImage(app.spritestrip3))
+    x = app.width/2 - app.scrollX 
+    y = app.height/2
+    canvas.create_image(app.gym[0]-app.scrollX, app.gym[1]+app.scrollY, image=ImageTk.PhotoImage(app.spritestrip5))
+
+    x = app.width/2
+    canvas.create_text(x, 20, text='Use arrows to move left or right')
+    canvas.create_text(x, 40, text=f'app.scrollX = {app.scrollX}')
+    sprite = app.sprite2[app.pos][app.spriteCounter]
+    cx, cy, r = app.width/2, app.height/2, 10
+    canvas.create_image(cx, cy, image=ImageTk.PhotoImage(sprite))
+
+runApp(width=300, height=300)
+
+
+
+'''
 def appStarted(app):
     url = 'Sprites/boy_run_1.png'
     app.spritestrip = app.loadImage(url)
@@ -254,7 +373,6 @@ runApp(width=400, height=400)
 
 
 
-
 def appStarted(app):
     url = 'Sprites/Grass.png'
     app.spritestrip = app.loadImage(url)
@@ -272,8 +390,10 @@ def timerFired(app):
    return
 
 def redrawAll(app, canvas):
-    canvas.create_image(300, 300, image=ImageTk.PhotoImage(app.spritestrip2))
-    canvas.create_image(500, 200, image=ImageTk.PhotoImage(app.spritestrip))
+    for j in range(2):
+        canvas.create_image(200, j*260, image=ImageTk.PhotoImage(app.spritestrip))
+    canvas.create_image(0, j*200, image=ImageTk.PhotoImage(app.spritestrip2))
+    
     canvas.create_line(105,0,105,400)
     #canvas.create_line(0,300,1000,300)
 runApp(width=400, height=400)

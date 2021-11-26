@@ -13,14 +13,15 @@ def wrapperaitree(self,enemy,depth):
     while(len(statedict) != 0):
         statedict.pop(L[i])
         i+=1
+    print(statedict)
     return aitree(self,enemy,depth,dic,prevmove)
 def aitree(self,enemy,depth,dic,prevmove):
     if(depth == 3):
         return 
     else:
         for i in self.curr.moves:
-            x = copy.copy(self)
-            y = copy.copy(enemy)
+            x = self.makecopy()
+            y = enemy.makecopy()
             moveuenemy = pickbestmove(x,y)
             moveuself = i
             battle2(x,y,moveuenemy,moveuself)
@@ -29,8 +30,8 @@ def aitree(self,enemy,depth,dic,prevmove):
             statedict[z] = state(x,y)
             aitree(x,y,depth+1,dic,z)
         for j in self.pokelist():
-            a = copy.copy(self)
-            b = copy.copy(enemy)
+            a = self.makecopy()
+            b = enemy.makecopy()
             if(j.currhp<0):
                 continue
             moveuenemy = pickbestmove(x,y)
@@ -96,7 +97,7 @@ def switch(Trainer1):
     
 
 def battle2(self,enemy,movenemy,moveself):
-            if(type(moveself) == string):
+            if(type(moveself) == str):
                 y = moveself.split('+')
                 for i in self.pokelist():
                     if(y[1] == i.name):
