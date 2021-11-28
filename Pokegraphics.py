@@ -2,6 +2,9 @@ from Pokemon import*
 from cmu_112_graphics import*
 from Gameai import*
 import math
+gymw = 250
+gymh = 135
+ls = []
 def distance(x1, y1, x2, y2):
     x = ((x2-x1)**2 + (y2-y1)**2)**0.5  # used formula
     return x
@@ -31,6 +34,8 @@ def appStarted(app):
     app.sprites = [ ]
     app.spritesdict = {}
     app.spritedict2 = {}
+    url = 'Sprites/Battlebackground.png'
+    app.sprite8 = app.loadImage(url)
     app.count = 0
     app.spritestrip2 = app.loadImage(url)
     for k in app.Trainer1.poklist: 
@@ -87,6 +92,20 @@ def appStarted(app):
         app.sprite2.append(app.temp) 
     app.spriteCounter = 0
     app.count = 0
+    url6= 'Sprites/Gymleader.png'
+    app.spritestrip6 = app.loadImage(url6)
+    BSPTree(app.width,app.height,0,0)
+    count = 0
+    for i in ls:
+        if(i[3] == 2 and count == 0):
+            app.cx, app.cy= i[0], i[1]
+            count+=1
+        elif(i[3] == 2 and count == 1):
+            app.gymx,app.gymy = i[0], i[1]
+            break
+    print(app.cx)
+    app.scrollX2 = 0
+    app.scrollY2 = 0
 def battle(app,Trainer1s,Trainer2s):
             moveai = ai(Trainer2s,Trainer1s)
            # print(moveai.name)
@@ -94,7 +113,7 @@ def battle(app,Trainer1s,Trainer2s):
             Pokemon2 = Trainer2s.curr   
             if(app.currmove == 'switch'):
                 Trainer1s.curr = app.pokeswitch
-            if(type(moveai) == string):
+            if(type(moveai) == str):
                 pokeswitchs = moveai.split('+')[1]
                 for i in Trainer2.pokelist():
                     if(i.name == pokeswitchs):
@@ -106,7 +125,7 @@ def battle(app,Trainer1s,Trainer2s):
                 if(Pokemon2.currhp<0):
                     print(f'{Pokemon1.name} wins')
                     return
-                if(type(moveai) != string):
+                if(type(moveai) != str):
                     app.currmove2 = moveai
                     damages2 = damage(Pokemon2,Pokemon1,moveai)
                     Pokemon1.currhp -= damages2
@@ -120,12 +139,7 @@ def battle(app,Trainer1s,Trainer2s):
                 if(app.currmove != 'switch'):
                     damages = damage(Pokemon1,Pokemon2,app.currmove)
                     Pokemon2.currhp -=damages
-#def keyPressed(app,event):
-#    if(event.key == 'k' and app.allowmove == False):
-#        app.allowmove == True
-#        app.allowmove2 == False
-#    elif(event.key == 'k' and app.allowmove == True and app.allowmove2 == False):
-#        app.allowmove2 == True
+
 def battle_timerFired(app):
     if( (app.Trainer1.teamalive() and app.Trainer2.teamalive()) and (app.allowmoves)): 
         battle(app,app.Trainer1,app.Trainer2)
@@ -148,9 +162,10 @@ def battle_timerFired(app):
                 app.spriteCounter1 = 0
                 break
     if(app.Trainer2.teamalive() == False or app.Trainer1.teamalive() == False):
-        app.mode = 'overworld'
         app.Trainer2.restoreall()
         app.Trainer1.restoreall()
+        app.mode = 'overworld'
+        
     
       
 def battle_mousePressed(app, event):
@@ -195,7 +210,8 @@ def battle_mousePressed(app, event):
         app.counter += 1
         app.count +=1
     
-def battle_redrawAll(app, canvas):#make a variable that is initally set false until I attack and then when it is true set write a statement that I used move x lower the hp and for the next player have it begin only when I click enter
+def battle_redrawAll(app, canvas):
+    canvas.create_image(app.width/2,app.height/2,image=ImageTk.PhotoImage(app.sprite8))
     sprite = app.spritesdict[app.Trainer1.curr.name][app.spriteCounter1]
     sprite2 = app.spritedict2[app.Trainer2.curr.name][app.spriteCounter2]
     canvas.create_image(app.width*(75/400), app.height*(250/400), image=ImageTk.PhotoImage(sprite))
@@ -272,26 +288,41 @@ def overworld_keyPressed(app, event):
         app.scrollX -= 10
         app.pos = 1
         app.spriteCounter = (1 + app.spriteCounter) % len(app.sprite2[app.pos])
-        if(ifanyin(app)):
+        if(ifanyin1(app)):
             app.scrollX+=10
     elif (event.key == "Right"): 
         app.scrollX += 10
         app.pos = 2
         app.spriteCounter = (1 + app.spriteCounter) % len(app.sprite2[app.pos])
-        if(ifanyin(app)):
+        if(ifanyin1(app)):
             app.scrollX-=10
     elif(event.key == "Up"):    
         app.scrollY +=10
         app.pos = 3
         app.spriteCounter = (1 + app.spriteCounter) % len(app.sprite2[app.pos])
-        if(ifanyin(app)):
+        if(ifanyin1(app)):
             app.scrollY-=10
     elif(event.key == "Down"):  
         app.scrollY -=10
         app.pos = 0
         app.spriteCounter = (1 + app.spriteCounter) % len(app.sprite2[app.pos])
-        if(ifanyin(app)):
-            app.scrollY+=10 
+        if(ifanyin1(app)):
+            app.scrollY+=10
+    elif(event.key == "Enter" and app.gym[0] - app.scrollX-100<app.width/2<app.gym[0] - app.scrollX+100
+        and app.gym[1]+app.scrollY-100<app.height/2<app.gym[1]+app.scrollY + 100):#magic number change later
+        app.Trainer2 = Trainer2
+        for a in app.Trainer2.poklist: 
+                app.sprites6 = [ ]
+                url = a.sprite
+                app.spritestrip7 = app.loadImage(url)
+                for j in range(len(a.slist)):
+                    for i in range(len(a.slist[0])):
+                        if(a.slist[j][i] == (0,0,0,0)):
+                            continue
+                        sprite = app.spritestrip7.crop((a.slist[j][i][0], a.slist[j][i][1] ,a.slist[j][i][2], a.slist[j][i][3]))
+                        app.sprites6.append(sprite)
+                app.spritedict2[a.name] = app.sprites6
+        app.mode = 'gym'               
 def overworld_timerFired(app):
     L = []
     app.count +=1
@@ -300,15 +331,30 @@ def overworld_timerFired(app):
         cy += app.scrollY
         L.append((cx,cy))
     for (cx, cy) in L:
-        if((app.width-25)/2<cx and cx <(app.width+25)/2 and (app.height-25)/2< cy and cy< (app.height+25)/2 and app.count%50 == 0):
+        if((app.width-25)/2<cx and cx <(app.width+25)/2 and (app.height-25)/2< cy and cy< (app.height+25)/2 and app.count%50 == 0): #magic number change later
             print('hi')
+            app.Trainer2 = Wild
+            for a in app.Trainer2.poklist: 
+                app.sprites6 = [ ]
+                url = a.sprite
+                app.spritestrip7 = app.loadImage(url)
+                for j in range(len(a.slist)):
+                    for i in range(len(a.slist[0])):
+                        if(a.slist[j][i] == (0,0,0,0)):
+                            continue
+                        sprite = app.spritestrip7.crop((a.slist[j][i][0], a.slist[j][i][1] ,a.slist[j][i][2], a.slist[j][i][3]))
+                        app.sprites6.append(sprite)
+                app.spritedict2[a.name] = app.sprites6
             app.mode = 'battle'
             break
-def ifanyin(app):
+def ifanyin1(app):
     for (cx, cy) in app.dotstrees:
         cx -= app.scrollX
         cy +=app.scrollY
-        if(circlesIntersect(cx,cy,10,app.width/2,app.height/2,10)):
+        if(circlesIntersect(cx,cy,10,app.width/2,app.height/2,10)):#magic number
+            return True
+        elif(app.gym[0]-app.scrollX-gymw/2<app.width/2<app.gym[0]-app.scrollX+gymw/2 and
+                app.gym[1]+app.scrollY-gymh/2<app.height/2<app.gym[1]+app.scrollY+gymh/2):
             return True
     return False
 def overworld_redrawAll(app, canvas):
@@ -334,74 +380,183 @@ def overworld_redrawAll(app, canvas):
 
     x = app.width/2
     canvas.create_text(x, 20, text='Use arrows to move left or right')
-    canvas.create_text(x, 40, text=f'app.scrollX = {app.scrollX}')
+    canvas.create_text(x, 40, text=f'app.scrollX = {app.scrollX}')  #magicnumbers
     sprite = app.sprite2[app.pos][app.spriteCounter]
     cx, cy, r = app.width/2, app.height/2, 10
     canvas.create_image(cx, cy, image=ImageTk.PhotoImage(sprite))
 
-runApp(width=300, height=300)
+def isin(cx,cy,roomsize):
+    for i in ls:
+        if((i[0]-i[2]/2)<cx+roomsize/2 and (i[0]+i[2]/2)>cx-roomsize/2 and (i[1] -i[2]/2)<cy+roomsize/2 and (i[1]+i[2]/2)>cy-roomsize/2):
+            return True
+    return False
+
+
+def BSPTree(width,height,depth,vorh):   
+    if(depth == 3):
+        return 
+    else:
+        if(vorh%2 == 0):
+            cx = random.randint(0,width//2)
+            cx2 = random.randint(width//2,width)
+            cy = random.randint(0,height)
+            roomsize = random.randint(50,100)
+            if(isin(cx,cy,roomsize) == False or depth != 2):
+                ls.append([cx,cy,roomsize,depth])
+                BSPTree(width//2,height,depth+1,vorh+1)
+            if(isin(cx2,cy,roomsize) == False or depth !=2):
+                ls.append([cx2,cy,roomsize,depth])
+                BSPTree(width,height,depth+1,vorh+1)
+        elif(vorh%2 == 1):
+            cx = random.randint(0,width)
+            cy = random.randint(0,height//2)
+            cy2 = random.randint(height//2,height)
+            roomsize = random.randint(50,100)
+            if(isin(cx,cy,roomsize) == False or depth !=2):
+                ls.append([cx,cy,roomsize,depth])
+                BSPTree(width,height//2,depth+1,vorh+1)
+            if(isin(cx,cy2,roomsize) == False or depth !=2):
+                ls.append([cx,cy2,roomsize,depth])
+                BSPTree(width,height,depth+1,vorh+1)
+
+            
+
+def gym_keyPressed(app, event):
+    if (event.key == "Left"):    
+        app.scrollX2 -= 5
+        app.pos = 1
+        app.spriteCounter = (1 + app.spriteCounter) % len(app.sprite2[app.pos])
+        if(ifanyin(app) == False):
+            app.scrollX2+=5
+    elif (event.key == "Right"): 
+        app.scrollX2 += 5
+        app.pos = 2
+        app.spriteCounter = (1 + app.spriteCounter) % len(app.sprite2[app.pos])
+        if(ifanyin(app) == False):
+            app.scrollX2-=5
+    elif(event.key == "Up"):    
+        app.scrollY2 +=5
+        app.pos = 3
+        app.spriteCounter = (1 + app.spriteCounter) % len(app.sprite2[app.pos])
+        if(ifanyin(app)== False):
+            app.scrollY2-=5
+    elif(event.key == "Down"):  
+        app.scrollY2 -=5
+        app.pos = 0
+        app.spriteCounter = (1 + app.spriteCounter) % len(app.sprite2[app.pos])
+        if(ifanyin(app) == False):
+            app.scrollY2+=5
+def ifanyin(app):
+    best = 10000000
+    cx2 = None
+    for (cx, cy,roomsize,depth) in ls:
+        x = ls.index([cx,cy,roomsize,depth])+1
+        cx -= app.scrollX2
+        cy +=app.scrollY2
+        if(depth == 2):
+            if(x<len(ls)-1):
+                for j in range(x,len(ls)):
+                    if(j<len(ls) and ls[j][3] == 2):
+                        (cx2,cy3,roomsize2, depth2) = ls[j]
+                        cx2 -=app.scrollX2
+                        cy3 +=app.scrollY2
+                       
+                        if(cx2>cx):
+                            if(cx+roomsize/2<app.cx<cx2+roomsize2/2 and cy-5<app.cy<cy+5):
+                                return True
+                        elif(cx>cx2):
+                            if(cx2+roomsize2/2<app.cx<cx+roomsize/2 and cy-5<app.cy<cy+5):
+                                return True
+                        if(cy3>cy):
+                            if(cy+roomsize/2<app.cy<cy3+roomsize2/2 and cx2-5<app.cx<cx2+5):
+                                return True
+                        elif(cy>cy3):
+                            if(cy3+roomsize2/2<app.cy<cy+roomsize/2 and cx2-5<app.cx<cx2+5):
+                                return True
+            if(best>distance(cx,cy,app.cx,app.cy)):
+                cx1 = cx
+                cy2 = cy
+                room = roomsize
+                best = distance(cx,cy,app.cx,app.cy)
+                y = x
+    
+    
+    if((cx1-room/2<app.cx<cx1+room/2 and cy2-room/2<app.cy<cy2+room/2)):
+         return True
+    return False   
+def gym_timerFired(app):
+    if(app.gymx-app.scrollX2-25<app.cx<app.gymx + app.scrollX2+25 and 
+    app.gymy+app.scrollY2-25 < app.cy<app.gymy+app.scrollY2 + 25 ):
+        app.mode = 'battle'
+
+def gym_redrawAll(app, canvas):
+    thickness = 5
+    canvas.create_rectangle(0,0,app.width,app.height,fill = 'black')
+    alreadin = []
+    for (cx,cy,roomsize,depth) in ls:
+        if(depth == 2):
+            x = ls.index([cx,cy,roomsize,depth])+1
+            cx-=app.scrollX2
+            cy += app.scrollY2
+            
+            canvas.create_rectangle(cx - (roomsize/2),cy-(roomsize/2),cx + (roomsize/2), cy + (roomsize/2),fill= 'green')
+            
+            for j in range(x,len(ls)):
+                if(j<len(ls) and ls[j][3] == 2):
+                    canvas.create_rectangle(ls[j][0] + ls[j][2]/2-app.scrollX2,cy - thickness,cx + roomsize/2, cy +thickness,fill = 'blue')
+                    canvas.create_rectangle(ls[j][0] + ls[j][2]/2-app.scrollX2- thickness,ls[j][1]  +ls[j][2]/2+app.scrollY2,ls[j][0] + ls[j][2]/2 + thickness - app.scrollX2,cy,fill = 'blue')
+                    alreadin.append(j)
+
+    x = app.width/2
+    canvas.create_text(x, 20, text='Use arrows to move left or right')
+    canvas.create_text(x, 40, text=f'app.scrollX = {app.scrollX}')
+    sprite = app.sprite2[app.pos][app.spriteCounter]
+    canvas.create_image(app.cx, app.cy, image=ImageTk.PhotoImage(sprite))
+    canvas.create_image(app.gymx-app.scrollX2, app.gymy+app.scrollY2, image=ImageTk.PhotoImage(app.spritestrip6))
+
+
+runApp(width=500, height=302)
 
 
 
 '''
 def appStarted(app):
-    url = 'Sprites/boy_run_1.png'
-    app.spritestrip = app.loadImage(url)
+    url = 'Sprites/Tepigfront.png'
+    app.spritestrip2 = app.loadImage(url)
     app.temp = [ ]
-    app.sprite2 = []
+    app.sprites2 = []
     app.pos = 0
-    for j in range(4):
-        app.temp = [ ]
-        for i in range(4):
-            sprite = app.spritestrip.crop((0+60*i,10+60*j,60*(i+1),10+60*(j+1)))
-            app.temp.append(sprite)
-        app.sprite2.append(app.temp) 
+    slist = [[[0,0,60,60],[60,0,135,60],[135,0,210,60],[210,0,285,60],[285,0,360,60],[360,0,435,60],[435,0,510,60]]
+ ,        [[0,60,60,120],[75,60,135,120],[135,60,210,120],[210,60,285,120],[285,60,360,120],[360,60,435,120],[435,60,510,120]]  ,
+           [[0,120,60,180],[60,120,135,180],[135,120,210,1800],[210,120,285,180],[285,120,360,180],[360,120,435,180],[435,120,510,180]]     ]
+    for j in range(len(slist)):
+            for i in range(len(slist[0])):
+                if(slist[j][i] == (0,0,0,0)):
+                    continue
+                sprite = app.spritestrip2.crop((slist[j][i][0], slist[j][i][1] ,slist[j][i][2], slist[j][i][3]))
+                app.sprites2.append(sprite)
     
     
     app.spriteCounter = 0
 
 def timerFired(app):
-    app.spriteCounter = (1 + app.spriteCounter) % len(app.sprite2[app.pos])
+    app.spriteCounter = (1 + app.spriteCounter) % len(app.sprites2)
 
 def redrawAll(app, canvas):
-    sprite = app.sprite2[0][app.spriteCounter]
-    canvas.create_image(300, 300, image=ImageTk.PhotoImage(sprite))
+    sprite = app.sprites2[app.spriteCounter]
+    canvas.create_image(250, 200, image=ImageTk.PhotoImage(sprite))
     #canvas.create_image(200, 200, image=ImageTk.PhotoImage(app.spritestrip))
-    canvas.create_line(260,0,260,400)
+    canvas.create_line(510,0,510,400)
     canvas.create_line(0,100,1000,100)
 runApp(width=400, height=400)
 
 
 
-def appStarted(app):
-    url = 'Sprites/Grass.png'
-    app.spritestrip = app.loadImage(url)
-    app.sprites = [ ]
-    url2 = 'Sprites/Grass 2.png'
-    app.spritestrip2 = app.loadImage(url2)
-
-    app.sprite = app.spritestrip.crop((30,0,55,30))
-               
-    
-    
-    app.spriteCounter = 0
-
-def timerFired(app):
-   return
-
-def redrawAll(app, canvas):
-    for j in range(2):
-        canvas.create_image(200, j*260, image=ImageTk.PhotoImage(app.spritestrip))
-    canvas.create_image(0, j*200, image=ImageTk.PhotoImage(app.spritestrip2))
-    
-    canvas.create_line(105,0,105,400)
-    #canvas.create_line(0,300,1000,300)
-runApp(width=400, height=400)
 
 
-#slist = [[(65,100,155,200),(165,100,255,200),(260,100,345,200),(360,100,440,200),(455,100,535,200),(550,100,635,200),(650,100,730,200),(745,100,825,200),(845,100,935,200)],
-#           [(65,200,155,300)]]
-
+#slist = [[[0,0,60,100],[60,0,135,100],[135,0,210,100],[210,0,285,100],[285,0,360,100],[360,0,435,100],[435,0,510,100]]
+# ,        [[0,100,60,200],[60,100,135,200],[135,100,210,200],[210,100,285,200],[285,100,360,200],[360,100,435,200],[435,100,510,200]]  ,
+#           [[0,200,60,300],[60,200,135,300],[135,200,210,300],[210,200,285,300],[285,200,360,300],[360,200,435,300],[435,200,510,300]]     ]
 
 '''
 

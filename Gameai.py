@@ -56,8 +56,12 @@ def state(self,enemy):
     hpself = 0
     hpenemy= 0 
     for i in self.poklist:
+        if(i.currhp<0):
+            continue
         hpself+= i.currhp
     for j in enemy.poklist:
+        if(j.currhp<0):
+            continue
         hpenemy+= j.currhp
     return (hpself - hpenemy)/(hpself+hpenemy)
 

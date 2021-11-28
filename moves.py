@@ -13,3 +13,7 @@ Thunderbolt = move('Thunderbolt', 'Electric',95,'sp')
 Hurricane = move('Hurricane','Flying',120,'sp')
 Heatwave = move('Heatwave','Fire',90,'sp')
 FocusBlast = move('FocusBlast', 'Fighting', 120, 'sp')
+Tackle = move('Tackle','Normal',50,'ap')
+WildCharge = move('WildCharge','Electric',90,'ap')
+HeadSmash = move('HeadSmash','Rock',150,'ap')
+

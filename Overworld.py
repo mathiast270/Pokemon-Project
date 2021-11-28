@@ -30,6 +30,8 @@ def appStarted(app):
     app.spritestrip = app.loadImage(url)
     url4 = 'Sprites/Grass.png'
     app.spritestrip4 = app.loadImage(url4)
+    url5 = 'Sprites/Gymleader.png'
+    app.spritestrip5 = app.loadImage(url5)
     app.temp = [ ]
     app.sprite2 = []
     app.pos = 0
@@ -41,9 +43,13 @@ def appStarted(app):
         app.sprite2.append(app.temp) 
     app.spriteCounter = 0
     BSPTree(600,600,0,0)
+    count = 0
     for i in ls:
-        if(i[3] == 2):
+        if(i[3] == 2 and count == 0):
             app.cx, app.cy= i[0], i[1]
+            count+=1
+        elif(i[3] == 2 and count == 1):
+            app.gymx,app.gymy = i[0], i[1]
             break
 def isin(cx,cy,roomsize):
     for i in ls:
@@ -106,8 +112,6 @@ def keyPressed(app, event):
         app.spriteCounter = (1 + app.spriteCounter) % len(app.sprite2[app.pos])
         if(ifanyin(app) == False):
             app.scrollY+=5
-def timerFired(app):
-    return
 def ifanyin(app):
     best = 10000000
     cx2 = None
@@ -159,34 +163,17 @@ def redrawAll(app, canvas):
             canvas.create_rectangle(cx - (roomsize/2),cy-(roomsize/2),cx + (roomsize/2), cy + (roomsize/2),fill= 'green')
             
             for j in range(x,len(ls)):
-                if(j<len(ls) and ls[j][3] == 2):# have another check for depth
+                if(j<len(ls) and ls[j][3] == 2):
                     canvas.create_rectangle(ls[j][0] + ls[j][2]/2-app.scrollX,cy - thickness,cx + roomsize/2, cy +thickness,fill = 'blue')
                     canvas.create_rectangle(ls[j][0] + ls[j][2]/2-app.scrollX- thickness,ls[j][1]  +ls[j][2]/2+app.scrollY,ls[j][0] + ls[j][2]/2 + thickness - app.scrollX,cy,fill = 'blue')
                     alreadin.append(j)
-
-  #  for j in range(16):
-   #     for i in range(16):
-    #         canvas.create_image(i*20, j*20, image=ImageTk.PhotoImage(app.spritestrip4))
-
-    
-#    for (cx, cy) in app.dotsgrass:
- #       cx -= app.scrollX  
-  #      cy += app.scrollY
-   #     canvas.create_image(cx, cy, image=ImageTk.PhotoImage(app.spritestrip2))
-   # for (cx, cy) in app.dotstrees:
-    #    cx -= app.scrollX
-    #    cy += app.scrollY
-                 
-     #   canvas.create_image(cx, cy, image=ImageTk.PhotoImage(app.spritestrip3))
-    #x = app.width/2 - app.scrollX 
-    #y = app.height/2
-
 
     x = app.width/2
     canvas.create_text(x, 20, text='Use arrows to move left or right')
     canvas.create_text(x, 40, text=f'app.scrollX = {app.scrollX}')
     sprite = app.sprite2[app.pos][app.spriteCounter]
     canvas.create_image(app.cx, app.cy, image=ImageTk.PhotoImage(sprite))
+    canvas.create_image(app.gymx-app.scrollX, app.gymy+app.scrollY, image=ImageTk.PhotoImage(app.spritestrip5))
 
 runApp(width=600, height=600)
 

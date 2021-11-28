@@ -30,7 +30,6 @@ class Pokemon(object):
         self.currdefense = self.defense
         self.currspdefense = self.spdefense
         self.currspeed = self.speed
-        self.slist = slist
     def pokecopy(self):
         x = Pokemon(self.name,self.type,self.moves,self.attack,self.currspattack,self.currhp,self.defense
         ,self.spdefense,self.speed,self.slist,self.sprite)
@@ -90,6 +89,10 @@ zaplist = [[(5,0,95,100),(105,0,195,100),(195,0,285,100),(300,0,380,100),(490,0,
 
 zaplistb = [[(5,0,95,100),(105,0,195,100),(235,0,310,100),(340,0,420,100),(440,0,535,100),(565,0,665,100),(675,0,760,100),(785,0,870,100)],
            [(5,100,95,200),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0)]]
+Teplistf = [[[0,0,60,60],[60,0,135,60],[135,0,210,60],[210,0,285,60],[285,0,360,60],[360,0,435,60],[435,0,510,60]]
+ ,        [[0,60,60,120],[75,60,135,120],[135,60,210,120],[210,60,285,120],[285,60,360,120],[360,60,435,120],[435,60,510,120]]  ,
+           [[0,120,60,180],[60,120,135,180],[135,120,210,1800],[210,120,285,180],[285,120,360,180],[360,120,435,180],[435,120,510,180]]     ]
+        
 Garchomp = Pokemon('Garchomp',['Dragon','Ground'],
 [Earthquake,DragonClaw,Flamethrower,Dragonpulse],359,259,420,289,269,303,garslist,'Sprites/Garchomp back.png')
 Zapdos = Pokemon('Zapdos',['Electric','Flying'], [Thunderbolt,Heatwave,Hurricane,FocusBlast],
@@ -118,10 +121,14 @@ Garchomp11 = Pokemon('Garchomp11',['Dragon','Ground'],
 [Earthquake,DragonClaw,Flamethrower,Dragonpulse],359,259,420,289,269,303,garslist,'Sprites/Garchomp front.png')
 Garchomp12 = Pokemon('Garchomp12',['Dragon','Ground'],
 [Earthquake,DragonClaw,Flamethrower,Dragonpulse],359,259,420,289,269,303,garslist,'Sprites/Garchomp front.png')
+Deadweight = Pokemon('Deadweight',['Dragon','Ground'],
+[Earthquake,DragonClaw,Flamethrower,Dragonpulse],359,259,0,289,269,303,garslist,'Sprites/Garchomp front.png')
+Tepig = Pokemon('Tepig',['Fire'],[Flamethrower,HeadSmash,WildCharge,Tackle],194,189,334,189,189,189,Teplistf,'Sprites/Tepigfront.png')
 Trainer1 = Trainer('Goku',Garchomp,Zapdos,Garchomp3,Garchomp4,Garchomp5,Garchomp6)
 Trainer2 = Trainer('Bob',Garchomp7,Zapdos2,Garchomp9,Garchomp10,Garchomp11,Garchomp12)
+Wild = Trainer('WildEncounter',Tepig,Deadweight,Deadweight,Deadweight,Deadweight,Deadweight)
 #print(delay(5))
-#Use dictionary later 
+#Use dictionary later
 def typeeffectiveness(defender,moveused):
     x = 1
     for i in range(len(defender.type)):
