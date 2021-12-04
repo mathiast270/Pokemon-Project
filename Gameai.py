@@ -1,20 +1,23 @@
-#separte battle function for the AI
+#Minimax game AI
 from Pokemon import*
 import copy
 import string
 statedict = {}
+#Resets global dictionary each time it is called
 def wrapperaitree(self,enemy,depth):
     dic = {}
     prevmove = ''
     L = []
-    for k in statedict:
+    for k in statedict: 
        L.append(k)
     i = 0
     while(len(statedict) != 0):
         statedict.pop(L[i])
         i+=1
-    print(statedict)
     return aitree(self,enemy,depth,dic,prevmove)
+
+#Uses Minimax algorithm to go through all the move that the AI can make 
+#and stores them in a dictionary
 def aitree(self,enemy,depth,dic,prevmove):
     if(depth == 3):
         return 
@@ -32,7 +35,7 @@ def aitree(self,enemy,depth,dic,prevmove):
         for j in self.pokelist():
             a = self.makecopy()
             b = enemy.makecopy()
-            if(j.currhp<0):
+            if(j.currhp<=0):
                 continue
             moveuenemy = pickbestmove(x,y)
             moveuself = 'switch+' + j.name
@@ -47,11 +50,9 @@ def aitree(self,enemy,depth,dic,prevmove):
         
 
         
-    #loop throught all elements of tree
-    # set those elements = to another tree with None values and updated data
-    #recursive call with increased depth and updated player conditions
-    return #returns tree each node should have 9 other nodes
-
+    
+    
+#calculates the state of the game by adding the hp of all the players pokemon
 def state(self,enemy):
     hpself = 0
     hpenemy= 0 
@@ -64,9 +65,9 @@ def state(self,enemy):
             continue
         hpenemy+= j.currhp
     return (hpself - hpenemy)/(hpself+hpenemy)
-
+#goes through the options in the state dictionary and finds the most 
+#advanageous one
 def pickmove(self):
-    print(self.curr.currhp)
     best = -10000
     bestmove = ''
     for k in statedict:
@@ -81,10 +82,11 @@ def pickmove(self):
             return i
     
     return moveog[1]
-    
+#picks the enemy move that'll do the most damage(we are assuming that's the 
+# action that player will take for simplicity and runtime) 
 def pickbestmove(self,enemy):
     best = 0
-    bestmove = 0
+    bestmove = 0    
     for i in enemy.curr.moves:
         damages = damage(enemy.curr,self.curr,i)
         if(damages>best):
